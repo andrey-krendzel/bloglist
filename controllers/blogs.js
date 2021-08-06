@@ -3,6 +3,8 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
+
+
 const getTokenFrom = request => {
   const authorization = request.get('authorization')
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
@@ -11,14 +13,13 @@ const getTokenFrom = request => {
   return null
 }
 
-
-blogsRouter.get('/', async (request, response) => {
+blogsRouter.get('/', async (request,response) => {
   const blogs = await Blog
   .find({}).populate('user', { username: 1, name: 1 })
   response.json(blogs)
-})
+}) 
 
-blogsRouter.post('/', async (request, response) => {
+blogsRouter.post('/', async (request,response) => {
   const body = request.body
   const token = getTokenFrom(request)
   const decodedToken = jwt.verify(token, process.env.SECRET)
@@ -36,10 +37,10 @@ blogsRouter.post('/', async (request, response) => {
   })
 
   const savedBlog = await blog.save()
-  
+
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
-  response.json(savedBlog)
+  reponse.json(savedBlog)
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
@@ -57,11 +58,12 @@ blogsRouter.put('/:id', (request, response, next) => {
     likes: body.likes
   }
 
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    .then(updatedBlog => {
-      response.json(updatedBlog)
-    })
-    .catch(error => next(error))
+  Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
+  .then(updatedBlog => {
+    reponse.json(updatedBlog)
+  })
+  .catch(error => next(error))
 })
+
 
 module.exports = blogsRouter
